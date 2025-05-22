@@ -76,15 +76,35 @@ export function getCalendarMonth(year: number, month: number): CalendarDay[] {
   return days;
 }
 
+/**
+ * Calculate the number of days between two dates, ignoring time of day
+ */
+function getDaysBetween(startDate: Date, endDate: Date): number {
+  // Create date objects with time set to noon to avoid DST issues
+  const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), 12, 0, 0);
+  const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate(), 12, 0, 0);
+  
+  // Calculate the time difference in milliseconds
+  const timeDiff = end.getTime() - start.getTime();
+  
+  // Convert to days and round to handle any DST issues
+  return Math.round(timeDiff / (1000 * 60 * 60 * 24));
+}
+
 export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
-  // Start of tomorrow in local timezone
-  const tomorrow = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+  // Get today's date with time set to noon (to avoid DST issues)
+  const today = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+  // Get tomorrow's date
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  
   const holidayDates = Object.keys(holidays).sort();
   
   const upcomingDates = holidayDates
     .filter(holidayDate => {
       const [year, month, day] = holidayDate.split('-').map(Number);
-      const holiday = new Date(year, month - 1, day);
+      // Create holiday date with noon time
+      const holiday = new Date(year, month - 1, day, 12, 0, 0);
       return holiday >= tomorrow;
     })
     .slice(0, count);
@@ -95,13 +115,11 @@ export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
 
   return upcomingDates.map(holidayDate => {
     const [year, month, day] = holidayDate.split('-').map(Number);
-    const holidayDate_ = new Date(year, month - 1, day);
-    // Create date objects with time set to midnight to ensure consistent day calculations
-    const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-    const endDate = new Date(holidayDate_.getFullYear(), holidayDate_.getMonth(), holidayDate_.getDate());
+    // Create holiday date with noon time
+    const holidayDate_ = new Date(year, month - 1, day, 12, 0, 0);
     
-    // Calculate days between dates (will be consistent regardless of the time of day)
-    const daysUntil = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    // Calculate days between today and the holiday
+    const daysUntil = getDaysBetween(today, holidayDate_);
 
     return {
       date: holidayDate_,
