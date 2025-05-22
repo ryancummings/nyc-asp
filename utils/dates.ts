@@ -97,18 +97,82 @@ export interface DebugDateInfo {
   nextHolidayDate: string;
   calculatedDays: number;
   rawTimeDiff: number;
+  isEDTEnvironment: boolean;
+  localTimeZoneOffset: number;
+  edtOffset: number;
 }
 
 // Global variable to store debug information
 export let debugDateInfo: DebugDateInfo | null = null;
 
+/**
+ * Get the current EDT offset in hours
+ * This handles Daylight Saving Time automatically
+ */
+function getEDTOffset(): number {
+  // Create a date object for New York (Eastern Time)
+  const nyDate = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+  const nyDateTime = new Date(nyDate);
+  
+  // Create a UTC date object for the same moment
+  const utcDate = new Date().toLocaleString('en-US', { timeZone: 'UTC' });
+  const utcDateTime = new Date(utcDate);
+  
+  // Calculate the difference in hours
+  const hoursDiff = (nyDateTime.getTime() - utcDateTime.getTime()) / (1000 * 60 * 60);
+  
+  return hoursDiff;
+}
+
+/**
+ * Get the local time zone offset in hours
+ */
+function getLocalOffset(): number {
+  // Get the local time zone offset in minutes and convert to hours
+  // Note: getTimezoneOffset() returns the difference in minutes between UTC and local time,
+  // with the sign reversed from what we typically expect
+  return -new Date().getTimezoneOffset() / 60;
+}
+
+/**
+ * Convert any date to EDT (Eastern Daylight Time)
+ * This works regardless of the server's time zone
+ */
+function convertToEDT(date: Date): Date {
+  // Create a new date object to avoid modifying the original
+  const newDate = new Date(date);
+  
+  // Get the current EDT offset and local offset
+  const edtOffset = getEDTOffset();
+  const localOffset = getLocalOffset();
+  
+  // Calculate the difference between local time and EDT
+  const offsetDiff = localOffset - edtOffset;
+  
+  // Adjust the date by the offset difference
+  newDate.setHours(newDate.getHours() - offsetDiff);
+  
+  return newDate;
+}
+
 export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
   // Store original input date for debugging
   const inputDateStr = date.toString();
   
+  // Convert to EDT time zone
+  const edtDate = convertToEDT(date);
+  
   // Get today's date with time set to noon (to avoid DST issues)
-  const today = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+  const today = new Date(
+    edtDate.getFullYear(), 
+    edtDate.getMonth(), 
+    edtDate.getDate(), 
+    12, 0, 0
+  );
   const normalizedDateStr = today.toString();
+  const localOffset = getLocalOffset();
+  const edtOffset = getEDTOffset();
+  const isEDT = Math.abs(localOffset - edtOffset) < 0.1; // Check if we're already in EDT
   
   // Get tomorrow's date
   const tomorrow = new Date(today);
@@ -145,7 +209,10 @@ export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
         normalizedDate: normalizedDateStr,
         nextHolidayDate: holidayDate_.toString(),
         calculatedDays: daysUntil,
-        rawTimeDiff: timeDiff
+        rawTimeDiff: timeDiff,
+        isEDTEnvironment: isEDT,
+        localTimeZoneOffset: localOffset,
+        edtOffset: edtOffset
       };
     }
 

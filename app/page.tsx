@@ -54,6 +54,10 @@ export default function Home() {
               <p><span className="text-blue-400">Calculated Days:</span> {debugDateInfo.calculatedDays}</p>
               <p><span className="text-blue-400">Raw Time Diff (ms):</span> {debugDateInfo.rawTimeDiff}</p>
               <p><span className="text-blue-400">Raw Time Diff (days):</span> {debugDateInfo.rawTimeDiff / (1000 * 60 * 60 * 24)}</p>
+              <p><span className="text-red-400">Is EDT Environment:</span> {debugDateInfo.isEDTEnvironment ? 'Yes (Already in EDT)' : 'No (Converted to EDT)'}</p>
+              <p><span className="text-green-400">Local Time Zone Offset:</span> {debugDateInfo.localTimeZoneOffset} hours from UTC</p>
+              <p><span className="text-green-400">EDT Offset:</span> {debugDateInfo.edtOffset} hours from UTC</p>
+              <p><span className="text-green-400">Time Zone Adjustment:</span> {debugDateInfo.isEDTEnvironment ? 'None needed' : `Applied ${(debugDateInfo.localTimeZoneOffset - debugDateInfo.edtOffset).toFixed(1)} hour offset`}</p>
             </pre>
           </div>
         )}
