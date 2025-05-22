@@ -1,4 +1,4 @@
-import { isHolidayToday, getUpcomingHolidays, formatDaysUntil, formatDateId, type Holiday } from '../utils/dates';
+import { isHolidayToday, getUpcomingHolidays, formatDaysUntil, formatDateId, debugDateInfo, type Holiday } from '../utils/dates';
 import { CalendarSection } from '../components/calendar-section';
 import { Footer } from '../components/footer';
 
@@ -42,6 +42,21 @@ export default function Home() {
         </div>
 
         <CalendarSection initialDate={today} />
+        
+        {/* Debug information */}
+        {debugDateInfo && (
+          <div className="mt-8 p-4 bg-gray-700/50 rounded-lg text-left text-xs font-mono overflow-auto">
+            <h3 className="font-bold mb-2 text-yellow-400">Debug Date Information:</h3>
+            <pre className="whitespace-pre-wrap break-all">
+              <p><span className="text-blue-400">Input Date:</span> {debugDateInfo.inputDate}</p>
+              <p><span className="text-blue-400">Normalized Date:</span> {debugDateInfo.normalizedDate}</p>
+              <p><span className="text-blue-400">Next Holiday Date:</span> {debugDateInfo.nextHolidayDate}</p>
+              <p><span className="text-blue-400">Calculated Days:</span> {debugDateInfo.calculatedDays}</p>
+              <p><span className="text-blue-400">Raw Time Diff (ms):</span> {debugDateInfo.rawTimeDiff}</p>
+              <p><span className="text-blue-400">Raw Time Diff (days):</span> {debugDateInfo.rawTimeDiff / (1000 * 60 * 60 * 24)}</p>
+            </pre>
+          </div>
+        )}
       </section>
       
       <Footer />

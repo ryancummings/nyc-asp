@@ -91,9 +91,25 @@ function getDaysBetween(startDate: Date, endDate: Date): number {
   return Math.round(timeDiff / (1000 * 60 * 60 * 24));
 }
 
+export interface DebugDateInfo {
+  inputDate: string;
+  normalizedDate: string;
+  nextHolidayDate: string;
+  calculatedDays: number;
+  rawTimeDiff: number;
+}
+
+// Global variable to store debug information
+export let debugDateInfo: DebugDateInfo | null = null;
+
 export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
+  // Store original input date for debugging
+  const inputDateStr = date.toString();
+  
   // Get today's date with time set to noon (to avoid DST issues)
   const today = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+  const normalizedDateStr = today.toString();
+  
   // Get tomorrow's date
   const tomorrow = new Date(today);
   tomorrow.setDate(tomorrow.getDate() + 1);
@@ -113,13 +129,25 @@ export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
     throw new Error('No future holidays found');
   }
 
-  return upcomingDates.map(holidayDate => {
+  const result = upcomingDates.map(holidayDate => {
     const [year, month, day] = holidayDate.split('-').map(Number);
     // Create holiday date with noon time
     const holidayDate_ = new Date(year, month - 1, day, 12, 0, 0);
     
     // Calculate days between today and the holiday
     const daysUntil = getDaysBetween(today, holidayDate_);
+    
+    // For the first holiday, store debug information
+    if (upcomingDates.indexOf(holidayDate) === 0) {
+      const timeDiff = holidayDate_.getTime() - today.getTime();
+      debugDateInfo = {
+        inputDate: inputDateStr,
+        normalizedDate: normalizedDateStr,
+        nextHolidayDate: holidayDate_.toString(),
+        calculatedDays: daysUntil,
+        rawTimeDiff: timeDiff
+      };
+    }
 
     return {
       date: holidayDate_,
@@ -128,6 +156,8 @@ export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
       dayOfWeek: holidayDate_.toLocaleDateString('en-US', { weekday: 'long' })
     };
   });
+  
+  return result;
 }
 
 export function formatDaysUntil(daysUntil: number): string {
