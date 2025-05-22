@@ -1,11 +1,17 @@
+'use client';
+
+import { useState } from 'react';
 import { isHolidayToday, getUpcomingHolidays, formatDaysUntil, formatDateId, debugDateInfo, type Holiday } from '../utils/dates';
 import { CalendarSection } from '../components/calendar-section';
 import { Footer } from '../components/footer';
 
 export default function Home() {
+  const [showDebug, setShowDebug] = useState(false);
   const today = new Date();
   const { isHoliday, holidayName } = isHolidayToday(today);
   const upcomingHolidays = getUpcomingHolidays(today);
+  
+  const toggleDebug = () => setShowDebug(!showDebug);
 
   return (
     <main className="min-h-screen p-3 sm:p-8 bg-gradient-to-b from-gray-900 to-gray-800">
@@ -44,7 +50,7 @@ export default function Home() {
         <CalendarSection initialDate={today} />
         
         {/* Debug information */}
-        {debugDateInfo && (
+        {debugDateInfo && showDebug && (
           <div className="mt-8 p-4 bg-gray-700/50 rounded-lg text-left text-xs font-mono overflow-auto">
             <h3 className="font-bold mb-2 text-yellow-400">Debug Date Information:</h3>
             <pre className="whitespace-pre-wrap break-all">
@@ -63,7 +69,7 @@ export default function Home() {
         )}
       </section>
       
-      <Footer />
+      <Footer showDebug={showDebug} onToggleDebug={toggleDebug} />
     </main>
   );
 }

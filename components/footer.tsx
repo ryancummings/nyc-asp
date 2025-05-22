@@ -1,4 +1,11 @@
-export function Footer() {
+'use client';
+
+interface FooterProps {
+  showDebug: boolean;
+  onToggleDebug: () => void;
+}
+
+export function Footer({ showDebug, onToggleDebug }: FooterProps) {
   return (
     <footer className="mt-12 py-6 border-t border-gray-700/50">
       <div className="max-w-4xl mx-auto text-center text-gray-400 text-sm">
@@ -13,9 +20,16 @@ export function Footer() {
             NYC Alternate Side Parking Homepage
           </a>
         </p>
-        <p>
+        <p className="mb-4">
           This application is for informational purposes only.
         </p>
+        
+        <button 
+          onClick={onToggleDebug}
+          className="text-xs px-3 py-1 bg-gray-700/50 hover:bg-gray-700 rounded-full transition-colors"
+        >
+          {showDebug ? 'Hide Debug Info' : 'Show Debug Info'}
+        </button>
       </div>
     </footer>
   );
