@@ -16,7 +16,7 @@ export default function Home() {
   return (
     <main className="min-h-screen p-3 sm:p-8 bg-gradient-to-b from-gray-900 to-gray-800">
       <section className="max-w-4xl mx-auto bg-gray-800/80 backdrop-blur-sm rounded-xl shadow-2xl p-4 sm:p-8 text-center border border-gray-700/50 ring-1 ring-gray-700/50">
-        <h1 className="text-4xl font-bold mb-8 text-white">NYC Alternate Side Parking Status</h1>
+        <h1 className="text-4xl font-bold mb-8 text-white">NYC Alternate Side Parking</h1>
         
         <div className="mb-8">
           <h2 className="text-2xl font-semibold mb-2 text-gray-100">Today&apos;s Status</h2>
