@@ -96,7 +96,12 @@ export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
   return upcomingDates.map(holidayDate => {
     const [year, month, day] = holidayDate.split('-').map(Number);
     const holidayDate_ = new Date(year, month - 1, day);
-    const daysUntil = Math.ceil((holidayDate_.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    // Create date objects with time set to midnight to ensure consistent day calculations
+    const startDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const endDate = new Date(holidayDate_.getFullYear(), holidayDate_.getMonth(), holidayDate_.getDate());
+    
+    // Calculate days between dates (will be consistent regardless of the time of day)
+    const daysUntil = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
     return {
       date: holidayDate_,
