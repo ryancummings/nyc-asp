@@ -91,20 +91,6 @@ function getDaysBetween(startDate: Date, endDate: Date): number {
   return Math.round(timeDiff / (1000 * 60 * 60 * 24));
 }
 
-export interface DebugDateInfo {
-  inputDate: string;
-  normalizedDate: string;
-  nextHolidayDate: string;
-  calculatedDays: number;
-  rawTimeDiff: number;
-  isEDTEnvironment: boolean;
-  localTimeZoneOffset: number;
-  edtOffset: number;
-}
-
-// Global variable to store debug information
-export let debugDateInfo: DebugDateInfo | null = null;
-
 /**
  * Get the current EDT offset in hours
  * This handles Daylight Saving Time automatically
@@ -156,9 +142,6 @@ function convertToEDT(date: Date): Date {
 }
 
 export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
-  // Store original input date for debugging
-  const inputDateStr = date.toString();
-  
   // Convert to EDT time zone
   const edtDate = convertToEDT(date);
   
@@ -169,10 +152,6 @@ export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
     edtDate.getDate(), 
     12, 0, 0
   );
-  const normalizedDateStr = today.toString();
-  const localOffset = getLocalOffset();
-  const edtOffset = getEDTOffset();
-  const isEDT = Math.abs(localOffset - edtOffset) < 0.1; // Check if we're already in EDT
   
   // Get tomorrow's date
   const tomorrow = new Date(today);
@@ -200,21 +179,6 @@ export function getUpcomingHolidays(date: Date, count: number = 3): Holiday[] {
     
     // Calculate days between today and the holiday
     const daysUntil = getDaysBetween(today, holidayDate_);
-    
-    // For the first holiday, store debug information
-    if (upcomingDates.indexOf(holidayDate) === 0) {
-      const timeDiff = holidayDate_.getTime() - today.getTime();
-      debugDateInfo = {
-        inputDate: inputDateStr,
-        normalizedDate: normalizedDateStr,
-        nextHolidayDate: holidayDate_.toString(),
-        calculatedDays: daysUntil,
-        rawTimeDiff: timeDiff,
-        isEDTEnvironment: isEDT,
-        localTimeZoneOffset: localOffset,
-        edtOffset: edtOffset
-      };
-    }
 
     return {
       date: holidayDate_,
