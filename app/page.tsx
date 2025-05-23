@@ -1,4 +1,4 @@
-import { isHolidayToday, getUpcomingHolidays, formatDaysUntil, formatDateId, debugDateInfo, type Holiday } from '../utils/dates';
+import { isHolidayToday, getUpcomingHolidays, formatDaysUntil, formatDateId, type Holiday } from '../utils/dates';
 import { CalendarSection } from '../components/calendar-section';
 import { Footer } from '../components/footer';
 
