@@ -1,11 +1,11 @@
-import { isHolidayToday, getUpcomingHolidays, formatDaysUntil, formatDateId, type Holiday } from '../utils/dates';
+import { isHolidayToday, getUpcomingHolidays, formatDaysUntil, formatDateId, type Holiday, convertToEDT } from '../utils/dates';
 import { CalendarSection } from '../components/calendar-section';
 import { Footer } from '../components/footer';
 
 export const revalidate = 300; // Revalidate every 5 minutes
 
 export default function Home() {
-  const today = new Date();
+  const today = convertToEDT(new Date());
   const { isHoliday, holidayName } = isHolidayToday(today);
   const upcomingHolidays = getUpcomingHolidays(today);
   

@@ -124,7 +124,7 @@ function getLocalOffset(): number {
  * Convert any date to EDT (Eastern Daylight Time)
  * This works regardless of the server's time zone
  */
-function convertToEDT(date: Date): Date {
+export function convertToEDT(date: Date): Date {
   // Create a new date object to avoid modifying the original
   const newDate = new Date(date);
   
