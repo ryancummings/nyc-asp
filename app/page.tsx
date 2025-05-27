@@ -2,6 +2,8 @@ import { isHolidayToday, getUpcomingHolidays, formatDaysUntil, formatDateId, typ
 import { CalendarSection } from '../components/calendar-section';
 import { Footer } from '../components/footer';
 
+export const revalidate = 60*5; // Revalidate every 5 minutes
+
 export default function Home() {
   const today = new Date();
   const { isHoliday, holidayName } = isHolidayToday(today);
