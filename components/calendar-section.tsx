@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Calendar } from './calendar';
 import { HolidayModal } from './holiday-modal';
-import { getHolidayDateRange } from '../utils/dates';
+import { getHolidayDateRange, convertToEDT } from '../utils/dates';
 
 interface CalendarSectionProps {
   initialDate: Date;
@@ -11,7 +11,7 @@ interface CalendarSectionProps {
 
 export function CalendarSection({ initialDate }: CalendarSectionProps) {
   const { start: minDate, end: maxDate } = getHolidayDateRange();
-  const [baseDate, setBaseDate] = useState(initialDate);
+  const [baseDate, setBaseDate] = useState(() => convertToEDT(initialDate));
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedHolidayName, setSelectedHolidayName] = useState<string>();
   
@@ -20,13 +20,13 @@ export function CalendarSection({ initialDate }: CalendarSectionProps) {
   
   const goToPreviousMonth = () => {
     if (canGoBack) {
-      setBaseDate(new Date(baseDate.getFullYear(), baseDate.getMonth() - 1, 1));
+      setBaseDate(convertToEDT(new Date(baseDate.getFullYear(), baseDate.getMonth() - 1, 1)));
     }
   };
   
   const goToNextMonth = () => {
     if (canGoForward) {
-      setBaseDate(new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1));
+      setBaseDate(convertToEDT(new Date(baseDate.getFullYear(), baseDate.getMonth() + 1, 1)));
     }
   };
 

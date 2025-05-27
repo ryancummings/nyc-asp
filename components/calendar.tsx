@@ -1,4 +1,4 @@
-import { getCalendarMonth, formatDateId } from '../utils/dates';
+import { getCalendarMonth, formatDateId, convertToEDT } from '../utils/dates';
 
 const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -10,7 +10,7 @@ interface CalendarProps {
 
 export function Calendar({ year, month, onDateClick }: CalendarProps) {
   const days = getCalendarMonth(year, month);
-  const monthName = new Date(year, month).toLocaleString('en-US', { month: 'long' });
+  const monthName = convertToEDT(new Date(year, month)).toLocaleString('en-US', { month: 'long' });
 
   return (
     <div className="w-full bg-gray-800 rounded-xl overflow-hidden border border-gray-700 shadow-xl">
@@ -29,6 +29,7 @@ export function Calendar({ year, month, onDateClick }: CalendarProps) {
             {/* Calendar days */}
             {days.map((day) => {
               const isWeekend = day.date.getDay() === 0 || day.date.getDay() === 6;
+              const isTodayAndHoliday = day.isToday && day.isHoliday;
               return (
                 <div
                   key={formatDateId(day.date)}
@@ -39,10 +40,12 @@ export function Calendar({ year, month, onDateClick }: CalendarProps) {
                     ${day.isCurrentMonth 
                       ? 'hover:bg-gray-600/70 hover:shadow-md hover:scale-105 cursor-pointer' 
                       : 'opacity-25 cursor-default'}
-                    ${day.isToday 
-                      ? 'ring-2 ring-blue-500 shadow-lg shadow-blue-500/20' 
-                      : ''}
-                    ${day.isHoliday 
+                    ${isTodayAndHoliday
+                      ? 'ring-4 ring-blue-500 bg-green-900/80 text-yellow-100 shadow-xl scale-110 z-10'
+                      : day.isToday
+                        ? 'ring-2 ring-blue-500 shadow-lg shadow-blue-500/20'
+                        : ''}
+                    ${!isTodayAndHoliday && day.isHoliday 
                       ? 'bg-green-900/50 hover:bg-green-800/70 ring-1 ring-green-500/30' 
                       : ''}
                     ${isWeekend ? 'text-gray-500' : 'text-gray-200'}
