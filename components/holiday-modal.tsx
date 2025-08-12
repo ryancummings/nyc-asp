@@ -1,3 +1,8 @@
+'use client';
+
+import { createPortal } from 'react-dom';
+import { useEffect, useState } from 'react';
+
 interface HolidayModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -6,18 +11,41 @@ interface HolidayModalProps {
 }
 
 export function HolidayModal({ isOpen, onClose, date, holidayName }: HolidayModalProps) {
-  if (!isOpen) return null;
+  const [mounted, setMounted] = useState(false);
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  if (!isOpen || !mounted) return null;
+
+  const modalContent = (
+    <div className="fixed inset-0 z-50">
+      {/* Modal content positioned relative to viewport */}
       <div 
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm" 
-        onClick={onClose} 
-      />
-      <div 
-        className="relative bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-2xl p-6 max-w-md w-full mx-4 border border-gray-700/50 ring-1 ring-gray-700/30"
-        onClick={e => e.stopPropagation()}
+        className="fixed inset-0 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
       >
+        <div 
+          className="relative bg-gray-800/90 backdrop-blur-sm rounded-xl shadow-2xl p-6 max-w-md w-full border border-gray-700/50 ring-1 ring-gray-700/30 z-10"
+          onClick={e => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+        >
         <div className="flex justify-between items-start mb-6">
           <div>
             <h2 className="text-xl font-semibold text-gray-100">{date.toLocaleDateString('en-US', { 
@@ -58,7 +86,10 @@ export function HolidayModal({ isOpen, onClose, date, holidayName }: HolidayModa
             </>
           )}
         </div>
+        </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
